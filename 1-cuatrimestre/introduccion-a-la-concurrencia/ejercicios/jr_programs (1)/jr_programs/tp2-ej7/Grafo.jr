@@ -1,0 +1,93 @@
+import edu.ucdavis.jr.JR;
+
+public class Grafo{
+
+    private static sem s1 = 0;
+    private static sem s2 = 0;
+    private static sem s3 = 0;
+    private static sem s4 = 0; //predecesor de t5 derecho
+    private static sem s5 = 0; //predecesor de t5 izquierdo
+    private static sem mutex = 1;
+
+    private static process t1{
+
+        P(mutex);
+        //ejecuto codigo
+        System.out.println("proceso t1 ha sido ejecutado");
+        V(mutex);
+        V(s1); //doble signal al semaforo s1 para evitar deadlock, es un lujito que nos podemos dar ya que t2 y t3 no comparten zona critica
+        V(s1); //tambien era solucionable colocando otro semaforo mas
+        
+    }
+
+    private static process t2{
+
+        System.out.println("el proceso t2 esta esperando");
+        P(s1);
+        P(mutex);
+        //ejecuto codigo
+        System.out.println("proceso t2 ha sido ejecutado");
+        V(mutex);
+        V(s3);
+        
+
+    }
+
+    private static process t3{
+
+        System.out.println("el proceso t3 esta esperando");
+        P(s1);
+        P(mutex);
+        //ejecuto codigo
+        System.out.println("proceso t3 ha sido ejecutado");
+        V(mutex);
+        V(s4);
+        
+
+    }
+
+    private static process t4{
+
+        System.out.println("el proceso t4 esta esperando");
+        P(s3);
+        P(mutex);
+        //ejecuto codigo
+        System.out.println("proceso t4 ha sido ejecutado");
+        V(mutex);
+        V(s5);
+        
+
+    }
+
+    private static process t5{
+
+        System.out.println("el proceso t5 esta esperando a t3");
+        P(s4);
+        System.out.println("el proceso t5 esta esperando a t4");
+        P(s5);
+        //ejecuto codigo
+        System.out.println("proceso t5 ha sido ejecutado");
+        
+        //no hace falta semaforo de exclusion mutua para el ultimo proceso
+
+    }
+
+
+    private static op void done() {
+
+        System.out.println("exit 0");
+
+    }
+
+    
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

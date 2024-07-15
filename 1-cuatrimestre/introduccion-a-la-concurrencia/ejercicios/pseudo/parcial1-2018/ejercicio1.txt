@@ -1,0 +1,44 @@
+# (03/04) Puerto Amarrate: muelle, barco y carga de containers con semáforos.
+# En  el  puerto de  “Amarrate”,  el  proceso de  carga  de  un  barco  transportador  es  el
+# siguiente:
+# Existen 2 vehículos cargadores de containers que acomodan hasta un máximo de 10 al
+# lado del barco. El barco a su vez posee una única grúa que va metiendo dichos containers en sus
+# bóvedas. A medida que la grúa libera un espacio al lado del barco, los cargadores pueden ir
+# ocupando ese espacio y colocar un nuevo container. El proceso culmina cuando los n containers
+# disponibles se han cargado al barco.
+# Escriba un programa concurrente que utiliza semáforos para sincronizar el trabajo de
+# los  vehículos  cargadores  y  la  grúa.  En  todo  momento este  programa  debe indicar cuántos
+# containers hay ubicados al lado del barco
+
+int MAX_CONTENEDORES_DISPONIBLES = 20
+int MAX_CONTENEDORES_ESPERANDO = 10
+
+int cantContenedoresEsperando = 0
+int cantContenedoresCargados = 0
+
+sem mutexCargarVehiculo = 1
+sem mutexDescargarVehiculoCargarBoveda = 1
+sem mutexCostado = 0
+
+process vehiculo[int i=0 to 1]:
+    while (cantContenedoresCargados <= MAX_CONTENEDORES_DISPONIBLES):
+        wait(mutexCargarVehiculo)
+        wait(mutexDescargarVehiculoCargarBoveda)
+        if (cantContenedoresEsperando === MAX_CONTENEDORES_ESPERANDO):
+            signal(mutexDescargarVehiculoCargarBoveda)
+            wait(mutexCostado)
+        cantContenedoresEsperando++
+        signal(mutexDescargarVehiculoCargarBoveda)
+        signal(mutexCargarVehiculo)
+
+process grua:
+    while (cantContenedoresCargados <= MAX_CONTENEDORES_DISPONIBLES):
+        wait(mutexDescargarVehiculoCargarBoveda)
+        if (cantContenedoresEsperando === MAX_CONTENEDORES_ESPERANDO):
+            cantContenedoresEsperando--
+            cantContenedoresCargados++
+            signal(mutexCostado)
+        elsif (cantContenedoresEsperando < 0)
+            cantContenedoresEsperando--
+            cantContenedoresCargados++
+        signal(mutexDescargarVehiculoCargarBoveda)

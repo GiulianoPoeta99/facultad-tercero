@@ -1,0 +1,92 @@
+import edu.ucdavis.jr.JR;
+import java.util.LinkedList;
+import java.util.Random;
+
+
+public class Barberia{
+    private static int M = 1000;
+    private static int N = 500;
+
+    private static sem clientes = 0;
+    private static sem barbero = 0;
+    private static sem mutex = 1;
+    private static sem cobrar = 0;
+    private static sem pagar = 0;
+
+    private static Queue clientes_esperando = new Queue(3);
+
+    private static process barber{
+        while (true) {
+            P(mutex);
+            if (!clientes_esperando.vacia()) {
+                int cliente = clientes_esperando.pop();
+                System.out.println("El barbero le esta cortando al cliente " + cliente);
+                V(mutex);
+                delay();
+                System.out.println("El barbero finalizo el corte al cliente " + cliente);
+                V(clientes);
+
+                System.out.println("El barbero le cobro al cliente " + cliente);
+               
+                P(pagar); //barrier hasta que el cliente pague
+                V(cobrar);      
+
+            } else {
+                V(mutex);
+                System.out.println("El barbero duerme...");
+                P(barbero);
+            }
+        }
+    }
+
+    private static  process customer((int i = 0 ; i < M ; i++)) {
+        delay();
+
+        P(mutex);
+        if (clientes_esperando.longitud() < 3) {
+            if (clientes_esperando.longitud() == 0) {
+                V(barbero); //despierta al barbero
+            }
+            clientes_esperando.push(i);
+            System.out.println("El cliente " + i + " esta esperando");
+            V(mutex);
+            P(clientes);
+            System.out.println("El cliente " + i + " tiene su nuevo corte");
+            
+            V(pagar); 
+            P(cobrar); //barrier hasta que el barbero cobre
+
+        } else {
+            System.out.println("El ciente " + i + " se va porque la barberia esta llena");
+            V(mutex);
+
+        }
+    }
+
+    private static void delay() {
+        Random random = new Random();
+        try {
+            // Duerme al proceso durante el tiempo especificado
+            Thread.sleep(random.nextInt(1001));
+        } catch (InterruptedException e) {
+            System.out.println("El filosofo fue interrumpido mientras pensaba.");
+        }
+    }
+
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+}

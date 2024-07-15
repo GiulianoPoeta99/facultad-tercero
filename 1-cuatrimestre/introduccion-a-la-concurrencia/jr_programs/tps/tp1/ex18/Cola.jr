@@ -1,0 +1,55 @@
+public class Cola {
+    private Object[] elementos;
+    private int tamano;
+    private int frente;
+    private int finalCola;
+    private int capacidad;
+
+    public Cola(int capacidad) {
+        this.capacidad = capacidad;
+        elementos = new Object[capacidad];
+        tamano = 0;
+        frente = 0;
+        finalCola = -1;
+    }
+
+    public boolean encolar(Object elemento) {
+        if (estaLlena()) {
+            return false;
+        }
+        finalCola = (finalCola + 1) % capacidad;
+        elementos[finalCola] = elemento;
+        tamano++;
+        return true;
+    }
+
+    public Object desencolar() {
+        if (estaVacia()) {
+            return null;
+        }
+        Object elementoDesencolado = elementos[frente];
+        frente = (frente + 1) % capacidad;
+        tamano--;
+        return elementoDesencolado;
+    }
+
+    public Object frente() {
+        if (estaVacia()) {
+            System.out.println("La cola esta vacia.");
+            return null;
+        }
+        return elementos[frente];
+    }
+
+    public int tamano() {
+        return tamano;
+    }
+
+    public boolean estaVacia() {
+        return tamano == 0;
+    }
+
+    public boolean estaLlena() {
+        return tamano == capacidad;
+    }
+}

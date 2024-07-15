@@ -1,0 +1,42 @@
+//buffer ilimitado un productor un consumidor
+
+import edu.ucdavis.jr.JR;
+
+public class ItemB {
+    private static sem full = 0; //solamente tengo que chequear que el consumidor no consuma vacio
+
+    private static integer[] buffer = new int[500];
+    private static int rear = 0;
+    private static int front = 0;
+    private static int data = 0;
+    
+    private static process producer{
+        while (true) {
+            data = data +1; 
+            buffer[rear] = data;
+            rear = (rear +1) % N;
+            V(full); 
+        }
+    }
+
+    private static process consumer{
+        while (true) {
+            P(full);
+            System.out.println("Consumed data: " + buffer[front]);
+            front = front + 1;
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done");
+    }
+
+}

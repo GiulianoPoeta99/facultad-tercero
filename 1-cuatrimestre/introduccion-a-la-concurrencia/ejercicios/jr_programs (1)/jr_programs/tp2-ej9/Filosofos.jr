@@ -1,0 +1,84 @@
+/*el algoritmo expuesto en el tp no es correcto ya que esa solución puede llevar a un deadlock bajo un intercalado de instrucciones en el que todos los filósofos toman sus tenedores izquierdos antes de que cualquiera de ellos intente tomar un tenedor derecho. En este caso, todos los filósofos están esperando el tenedor derecho pero ninguno ejecutará una sola instrucción., ademas hay un error en el programa ya que en las lineas 12 y 13 utiliza wait en vez de signal
+En este programa se plantea una solucion al deadlock haciendo que el quinto filosofo agarre el tenedor derecho antes que el izquierdo
+ */
+
+import edu.ucdavis.jr.JR;
+import java.util.Random;
+
+public class Filosofos{
+
+    //private static sem espacio = 2;
+    private static final int N = 5;
+
+    private static cap void () fork[] = new cap void()[N];
+    static {
+        int [] tinit  = {1,1,1,1,1};
+        for ( int i = 0 ; i < N ; i ++) {
+            fork[i] = new sem(tinit[i]);
+        }
+    }
+
+
+
+    private static process filosofo((int i = 0 ; i < 4; i++ )) {
+        while (true) {
+            pensar(i);
+            //P(espacio);
+            P(fork[i]);
+            System.out.println("El filosofo "+ i +" agarro el tenedor " + i);
+            P(fork[i + 1]);
+            System.out.println("El filosofo "+ i +" agarro el tenedor " + i+1);
+            comer(i);
+            V(fork[i]);
+            V(fork[i + 1]);
+            //V(espacio);
+        }
+    }
+
+    private static process quintoFilosofo {
+        while (true) {
+            pensar(4);
+            System.out.println("El filosofo " + 4+" penso");
+            P(fork[0]);
+            System.out.println("El filosofo 4 agarro el tenedor 0");
+            P(fork[4]);
+            comer(4);
+            V(fork[0]);
+            V(fork[4]);
+        }
+        
+    }
+
+    public static void comer(int i) {
+        System.out.println("El filosofo " + i + " pudo comer");
+    }
+
+
+    public static void pensar(int i) {
+        
+
+        try {
+            // Duerme al proceso durante el tiempo especificado
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            System.out.println("El filosofo fue interrumpido mientras pensaba.");
+        }
+    }
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

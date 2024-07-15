@@ -1,0 +1,48 @@
+import edu.ucdavis.jr.JR;
+//buffer acotado, 1 productor y un consumidor
+
+public class ItemD {
+
+    private static final int N = 10;
+    private static sem empty = N; //buffer de 10
+    private static sem full = 0;
+    private static int data = 0;
+    private static int[] buffer = new int[N];
+
+    private static int rear = 0;
+    private static int front = 0;
+
+    private static process producer{
+        while(true) {
+            P(empty);       
+            buffer[rear] = data;
+            System.out.println( buffer[rear] + "Producido en la posicion " + rear);
+            data++;
+            rear = (rear + 1) % N;
+            V(full);
+        }
+        
+    }
+
+    private static process consumer{
+        while (true) {
+            P(full);
+            System.out.println( buffer[front] + "Consumido de la posicion " + front);
+            front = (front + 1) % N;
+            V(empty);
+        }
+        
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done");
+    }
+}

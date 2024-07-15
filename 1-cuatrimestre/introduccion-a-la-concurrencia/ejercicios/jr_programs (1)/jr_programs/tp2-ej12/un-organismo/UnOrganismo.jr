@@ -1,0 +1,136 @@
+import edu.ucdavis.jr.JR;
+import java.util.Random;
+
+public class UnOrganismo{
+
+    private static int rojas_necesarias = 0;
+    private static int blancas_necesarias= 0;
+    private static int blancas_por_entrar = 0;
+
+    private static sem mutex_vulnerable = 1;
+
+    private static sem mutex_blanca = 1;
+    private static sem ingreso_blanca = 2;
+    private static sem blancas_listo = 0;
+    private static sem mutex_entrar = 1; //mutex de blancas_por_entrar
+    
+    private static sem rojas_listo = 0;
+    private static sem mutex_roja = 1;
+
+    private static boolean vulnerable = false;
+
+
+    private static process organismoX{
+        Random random = new Random();
+
+        P(mutex_vulnerable);
+        while (!vulnerable) {
+            V(mutex_vulnerable);
+            delay();
+
+            P(mutex_vulnerable);
+            vulnerable = random.nextBoolean();
+            if (vulnerable) {
+                System.out.println("El organismo se encuentra en estado vulnerable");
+            } else {
+                System.out.println("El organismo sigue sin vulnerarse");
+            }
+        }
+
+        V(mutex_vulnerable);
+        
+        P(rojas_listo); //espero a que hayan 2 rojas
+        P(blancas_listo); //espero a que hayan 4 blancas
+
+        System.out.println("el organismo murio");
+        
+    }
+
+    private static process bacteriaRoja((int i=1 ; i < 50; i++)) {
+        
+        P(mutex_vulnerable);
+        while (!vulnerable) {
+            V(mutex_vulnerable);
+            
+            P(mutex_vulnerable);
+        }
+        V(mutex_vulnerable);
+
+        P(mutex_roja);
+        if (rojas_necesarias < 2) {
+            //entra al organismo
+            System.out.println("La bacteria roja " + i + " esta ingresando");
+            rojas_necesarias++;
+            System.out.println("La bacteria roja " + i +" entro al organismo");
+            
+            if (rojas_necesarias == 2) {
+                V(rojas_listo); //sincronizo rojas
+            }
+            V(mutex_roja);
+
+            
+        } else {
+            V(mutex_roja); 
+        }
+    }
+
+    private static process bacteriaBlanca((int i=1 ; i < 80; i++)) {
+        
+        P(mutex_vulnerable);
+        while (!vulnerable) {
+            V(mutex_vulnerable);
+            
+            P(mutex_vulnerable);
+        }
+        V(mutex_vulnerable);
+
+        P(mutex_entrar);
+        if (blancas_por_entrar < 4) {
+            blancas_por_entrar++; //controlo la cantidad de bacterias que quieren atacar al organismo
+            V(mutex_entrar);
+
+            P(ingreso_blanca); //limite de bacterias blancas que ingresan al "mismo tiempo"
+            System.out.println("La bacteria blanca " + i + " esta ingresando");
+            P(mutex_blanca); 
+            blancas_necesarias++;
+            System.out.println("La bacteria blanca " + i +" entro al organismo");
+
+            if (blancas_necesarias == 4) {
+                V(blancas_listo); //sincronizo blancas
+            }
+            V(mutex_blanca);
+
+            V(ingreso_blanca);
+            
+        } else {
+            V(mutex_entrar);
+        }
+    }
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    private static void delay() {
+        Random random = new Random();
+        try {
+            // Duerme al proceso durante el tiempo especificado
+            Thread.sleep(random.nextInt(500));
+        } catch (InterruptedException e) {
+            System.out.println("error");
+        }
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

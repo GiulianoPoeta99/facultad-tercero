@@ -1,0 +1,84 @@
+//prioridad de lector significa que ningun lector debe esperar si el archivo ya esta abierto para lectura
+
+import edu.ucdavis.jr.JR;
+import java.util.Random;
+
+public class PrioridadLector{
+
+    private static sem readWrite = 1;
+    private static sem mutex = 1;
+
+    private static final int N = 7 ;
+    private static final int M = 10 ;
+    private static int lectoresActivos = 0;
+    private static process lector((int i = 0 ; i < M ; i++)) {
+
+        while (true) {
+            P(mutex);
+            lectoresActivos++;
+            if (lectoresActivos == 1) {
+                P(readWrite); //bloqueo/espero a los escritores
+            }
+            V(mutex);
+
+            
+            System.out.println("El lector " + i + " pudo leer el documento" );
+
+            P(mutex);
+            lectoresActivos--;
+            if (lectoresActivos == 0) {
+                V(readWrite);
+            }
+            Random random = new Random();
+            int tiempoAleatorio = random.nextInt(1001);
+            V(mutex);
+
+            dormir(tiempoAleatorio);
+            
+        }
+        
+
+    }
+
+    private static process escritor ((int i = 0 ; i < N ; i++)) {
+
+        while (true) {
+            P(readWrite); //bloqueo/espero a los lectores 
+            System.out.println("El escritor " + i + " escribio");
+            Random random = new Random();
+            int tiempoAleatorio = random.nextInt(1001);
+            V(readWrite);
+
+            dormir(tiempoAleatorio);
+        }
+        
+    }
+
+
+    public static void dormir(long tiempoEnMilisegundos) {
+        try {
+            // Duerme al proceso durante el tiempo especificado
+            Thread.sleep(tiempoEnMilisegundos);
+        } catch (InterruptedException e) {
+            System.out.println("El proceso fue interrumpido mientras dormia.");
+        }
+    }
+    
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

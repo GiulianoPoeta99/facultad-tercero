@@ -1,0 +1,48 @@
+import edu.ucdavis.jr.JR;
+
+public class NOrganismos{
+
+
+    
+    private static process organismoX((int i = 0 ; i < 5 ; i++)) {
+        Random random = new Random();
+
+        P(mutex_vulnerable);
+        while (!vulnerable) {
+            V(mutex_vulnerable);
+            delay();
+
+            P(mutex_vulnerable);
+            vulnerable = random.nextBoolean();
+            if (vulnerable) {
+                System.out.println("El organismo se encuentra en estado vulnerable");
+            } else {
+                System.out.println("El organismo sigue sin vulnerarse");
+            }
+        }
+
+        V(mutex_vulnerable);
+        
+        P(rojas_listo); //espero a que hayan 2 rojas
+        P(blancas_listo); //espero a que hayan 4 blancas
+
+        System.out.println("el organismo murio");
+    }
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

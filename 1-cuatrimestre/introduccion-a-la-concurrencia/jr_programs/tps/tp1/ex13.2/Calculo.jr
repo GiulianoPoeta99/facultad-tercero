@@ -1,0 +1,57 @@
+import edu.ucdavis.jr.JR;
+
+public class Calculo {
+    private static float a = 2;
+    private static float b = 3;
+    private static float c = 4;
+    private static float d = 1;
+    private static float e = 2;
+    private static float f = 1;
+    private static double multiplicacion;
+    private static double base;
+    private static double exponente;
+    private static double numerador;
+    private static double denominador;
+    private static double total;
+
+    private static process calcularMultiplicacion {
+        multiplicacion = 3 * a * b;
+        System.out.println("Multiplicacion: " + multiplicacion);
+    }
+
+    private static process calcularBase {
+        base = c - d;
+        System.out.println("Base: " + base);
+    }
+
+    private static process calcularExponente {
+        exponente = e - f;
+        System.out.println("Exponente: " + exponente);
+    }
+
+    private static process calcularNumerador {
+        while (multiplicacion == 0) {} 
+        numerador = multiplicacion + 4;
+        System.out.println("Numerador: " + numerador);
+    }
+
+    private static process calcularDenominador {
+        while (base == 0 || exponente == 0) {} 
+        denominador = Math.pow(base, exponente);
+        System.out.println("Denominador: " + denominador);
+    }
+
+    private static op void done() {
+        while (numerador == 0 && denominador == 0) {}
+        total = numerador / denominador;
+        System.out.println("Total: " + total);
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}

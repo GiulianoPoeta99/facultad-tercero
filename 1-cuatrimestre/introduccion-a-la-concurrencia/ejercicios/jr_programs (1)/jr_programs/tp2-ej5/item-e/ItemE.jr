@@ -1,0 +1,69 @@
+import edu.ucdavis.jr.JR;
+
+public class ItemE {
+    private static final int N = 5;
+    private static final int M = 3;
+
+    private static sem empty = N; //buffer de 5
+    private static sem full = 0;
+
+    private static sem mutexProd = 1;
+    private static sem mutexConsum = 1;
+
+    private static int data = 0;
+    private static int[] buffer = new int[N];
+
+    private static int rear = 0;
+    private static int front = 0;
+
+    private static process producer((int i = 0 ; i <= N; i++)){
+        while(true) {
+            P(mutexProd);
+            P(empty);       
+            
+            buffer[rear] = data;
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            
+            System.out.println( buffer[rear] + " Producido en la posicion " + rear + " por el proceso " + i );
+            data++;
+            rear = (rear + 1) % N;
+            V(full);
+            V(mutexProd);
+        }   
+        
+    }
+
+    private static process consumer((int i = 0; i <= M; i++)){
+        while (true) {
+            
+            P(full);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            P(mutexConsum);
+            System.out.println( buffer[front] + " Consumido de la posicion " + front + " por el proceso " + i);
+            front = (front + 1) % N;
+            V(empty);
+            V(mutexConsum);
+        }
+        
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done");
+    }
+}

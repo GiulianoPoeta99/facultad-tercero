@@ -1,0 +1,113 @@
+/*prioridad de escritor consiste en que mientras un proceso escriba, el resto de escritores seran los siguientes en ser ejecutados sin tener que esperar a los lectores
+Si un escritor quiere acceder a la sección crítica, bloquea tanto a los lectores como a otros escritores.
+Los lectores deben esperar a que todos los escritores terminen antes de poder acceder a la sección crítica.
+Una vez que todos los escritores han terminado, los lectores pueden acceder a la sección crítica, pero ningún escritor puede acceder hasta que todos los lectores hayan terminado.
+Se dice que hay prioridad de escritor pero de todas formas los lectores no sufren tanta starvation
+*/
+
+
+import edu.ucdavis.jr.JR;
+import java.util.Random;
+
+public class PrioridadEscritor{
+
+    private static sem blockRead = 1;
+    private static sem blockWrite = 0;
+
+    private static sem mutexReaders = 1;
+    private static sem mutexWriters = 1;
+
+    private static final int N = 8;
+    private static final int M = 2 ;
+    private static int lectoresActivos = 0;
+    private static int escritoresActivos = 0;
+
+    private static process lector((int i = 0 ; i < M ; i++)) {
+
+        while (true) {
+            
+            P(mutexReaders);
+            lectoresActivos++;
+            if (lectoresActivos == 1) {
+                P(blockRead); //bloqueo/espero a los escritores
+            }
+            V(mutexReaders);
+
+            System.out.println("El lector " + i + " pudo leer el documento" );
+
+
+            P(mutexReaders);
+            lectoresActivos--;
+            if (lectoresActivos == 0) {
+                V(blockRead);
+            }
+            V(mutexReaders);
+            
+            Random random = new Random();
+            int tiempoAleatorio = random.nextInt(1001);
+            dormir(tiempoAleatorio);
+            
+        }
+        
+
+    }
+
+    private static process escritor ((int i = 0 ; i < N ; i++)) {
+
+        while (true) {
+
+            P(mutexWriters);
+            escritoresActivos++;
+            if (escritoresActivos == 1) {
+                P(blockRead); //bloqueo/espero a los lectores
+                V(blockWrite); //como el sem esta inicializado en 0 actua como barrier
+            }
+            V(mutexWriters);
+
+            P(blockWrite); //todos los demas escritores que no sean el primero en haber entrado van a esperar aca (barrier)
+            System.out.println("El escritor " + i + " escribio"); 
+            V(blockWrite);
+            
+            P(mutexWriters);
+            escritoresActivos--;
+            if (escritoresActivos == 0) {
+                V(blockRead); //libero el documento para que se pueda leer o escribir nuevamente si hay mala suerte
+                System.out.println("El escritor " + i + " libera el archivo para poder ser leido o escrito nuevamente");
+            }
+            V(mutexWriters);
+
+            Random random = new Random();
+            int tiempoAleatorio = random.nextInt(1001);
+            dormir(tiempoAleatorio);
+        }
+        
+    }
+
+
+    public static void dormir(long tiempoEnMilisegundos) {
+        try {
+            // Duerme al proceso durante el tiempo especificado
+            Thread.sleep(tiempoEnMilisegundos);
+        } catch (InterruptedException e) {
+            System.out.println("El proceso fue interrumpido mientras dormia.");
+        }
+    }
+    
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

@@ -1,0 +1,70 @@
+import edu.ucdavis.jr.JR;
+
+
+//Tiene potencial a no cumplir con la propiedad de exclusion mutua
+//ambos procesos pueden encontrar lock=false antes de que alguno
+//de los dos lo asigne verdadero. Por lo que 2 procesos podria ejecutar 
+//la seccion critica al mismo tiempo
+
+public class SpinLock{
+
+    private static int x = 0;
+    private static int y = 0;
+    private static int S = 5; //sesiones
+    
+    private static boolean lock = false;
+    
+    private static process p1{
+        
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                if (!lock) {
+                    //entry protocol
+                    lock = true;
+    
+                    //critical section
+                    x = x*2;
+                    y = y + x;
+    
+                    //exit protocol
+                    lock = false;
+                    break;
+                }
+            }
+        }
+    }
+    
+
+    private static process p2{
+
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                if (!lock) {
+                    //entry protocol
+                    lock = true;
+    
+                    //critical section
+                    x = x + 2;
+                    y = y - x;
+                    
+                    //exit protocol
+                    lock = false;
+                    break;
+                }
+            }
+        } 
+    }
+
+
+    public static void main(String[] args) {
+        try {
+			JR.registerQuiescenceAction(done);
+		} catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+			//TODO: handle exception
+		}
+    }
+
+    private static op void done(){
+        System.out.println("Resultado: x = "+x + ", y = " + y);
+    }
+}

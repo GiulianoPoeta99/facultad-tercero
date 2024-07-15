@@ -1,0 +1,36 @@
+import edu.ucdavis.jr.JR;
+
+public class ProductorConsumidor {
+    private static Cola buffer = new Cola(10); 
+
+    private static process productor {
+        int producto = 0;
+        while (true) {
+            while (buffer.estaLlena()) {}
+            producto++;
+            if (buffer.encolar(producto)) {
+                System.out.println("CREADO: producto n: " + producto); 
+            } else {
+                producto--;
+            }
+        }
+    }
+
+    private static process consumidor {
+        while (true) {
+            while (buffer.estaVacia()) {} 
+            Object producto = buffer.desencolar(); 
+            System.out.println("CONSUMIDO: producto n: " + producto);
+        }
+    }
+
+    private static op void done() {}
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}

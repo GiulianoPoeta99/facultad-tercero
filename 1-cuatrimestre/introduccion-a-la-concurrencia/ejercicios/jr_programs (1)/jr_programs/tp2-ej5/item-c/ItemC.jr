@@ -1,0 +1,56 @@
+//buffer ilimitado con n productores y m consumidores
+
+import edu.ucdavis.jr.JR;
+
+public class ItemC {
+
+    private static int[] buffer = new int[500];
+
+    private static int data = 0;
+
+    private static int front = 0;
+    private static int rear = 0;
+
+    private static sem mutexProd = 1; 
+    private static sem mutexConsum = 1;
+    private static sem full = 0;
+
+    private static final int N = 10;
+    private static final int M = 7;
+
+    private static process producer((int i = 1 ; i<= N; i++)) {
+        while (true) {
+            P(mutexProd);
+            data++;
+            buffer[rear] = data;
+            System.out.println(buffer[rear] + " producido por el proceso " + i);
+            rear++;
+            V(mutexProd);
+            V(full);
+        }
+    }
+
+    private static process consumer( (int i = 1 ; i <= M; i++)) {
+        while (true) {
+            P(full);
+            P(mutexConsum);
+            System.out.println(buffer[front] + " consumido por el proceso " + i);
+            front++;
+            V(mutexConsum);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done");
+    }
+}
+

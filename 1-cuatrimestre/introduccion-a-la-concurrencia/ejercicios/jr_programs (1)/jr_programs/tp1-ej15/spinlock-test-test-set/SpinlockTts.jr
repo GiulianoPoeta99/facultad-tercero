@@ -1,0 +1,72 @@
+import edu.ucdavis.jr.JR;
+
+//se reduce la contencion de memoria y la cantidad de invalidacion de cache modificando el protocolo de entrada. Se mejora la probabilidad de que devuelva falso asi, sobreesribe menos veces la variable.
+//de todas formas la contencion de memoria no desaparece
+public class SpinlockTts {
+
+    private static int x = 0;
+    private static int y = 0;
+    private static boolean lock = false;
+
+    private static int S = 4;
+
+
+    private static boolean testSet(boolean lock) {
+        boolean initial = lock;
+        lock = true;
+        return initial;
+    }
+
+    private static process process1{
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                //entry protocol
+                while (lock) {};
+                while (testSet(lock)) {
+                    while (lock) {}; //lee desde su cache local sin afectar al resto de procesos
+                }
+
+                //critical section
+                x = x +1;
+                y = y + x;
+    
+                //exit protocol
+                lock = false;
+                break;
+            }
+        }
+    }
+                    
+    private static process process2{
+
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                //entry protocol
+                while (lock) {};
+                while (testSet(lock)) {
+                    while (lock) {};
+                }
+
+                //critical section
+                x = x + 2;
+                y = y - x;
+    
+                //exit protocol
+                lock = false;
+                break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+}

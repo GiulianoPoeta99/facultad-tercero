@@ -1,0 +1,98 @@
+//Esta solucion solo sirve para exclusion mutua entre 2 procesos
+//funciona perfectamente con debilmente justos
+//evita la alternacion estricta
+//dekker
+
+import edu.ucdavis.jr.JR;
+
+
+public class TieBreaker {
+
+    private static boolean turn = false;
+    private static int S = 6;
+    private static int x = 0;
+    private static int y = 0;
+    private static boolean[] flag = new boolean[2];
+
+    static {
+        flag[0] = false;
+        flag[1] = false;
+    }
+    
+    
+
+    private static process process1{
+        for (int s = 0 ; s <= S ;s++) {
+            do {
+                flag[0] = true;
+                while (flag[1]) {
+                    if (turn == true) {
+                        flag[0] = false;
+                        while (turn == true) {
+                            System.out.println("esperando (p1)");
+                        };
+                        flag[0] = true;
+
+                       
+                    }
+                }
+                //critical section
+                x = x +1;
+                y = y + x;
+
+                //exit protocol
+
+                turn = true;
+                flag[0] = false;
+
+                break;
+            } while (true);
+        }
+    }
+
+    private static process process2{
+        for (int s = 0 ; s <= S ;s++) {
+            do {
+                flag[1] = true;
+                while (flag[0]) {
+                    if (turn == false) {
+                        flag[1] = false;
+                        while (turn == false) {
+                            System.out.println("esperando (p2)");
+                        };
+                        flag[1] = true;
+
+                    }
+                }
+                //critical section
+                x = x + 2;
+                y = y - x;
+
+                //exit protocol
+
+                turn = false;
+                flag[1] = false;
+                break;
+
+            } while (true);
+        }
+    }
+
+
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+}
+
+
+
+

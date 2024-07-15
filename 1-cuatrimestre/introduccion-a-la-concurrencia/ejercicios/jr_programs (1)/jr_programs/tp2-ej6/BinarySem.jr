@@ -1,0 +1,48 @@
+//Un semaforo binario es basicamente un semaforo general inicializado en 1
+//De todas formas aca hay un ejemplo mas divertido de un semaforo binario dividido
+
+import edu.ucdavis.jr.JR;
+
+public class BinarySem{
+
+    private static int x = 0;
+    private static final int N = 20;
+    private static final int C = 4;
+
+    private static cap void () mutex[] = new cap void()[N];
+    static {
+        mutex[0] = new sem(1);
+        for (int i = 1; i < N ; i++) {
+            mutex[i] = new sem;
+        }
+    }
+
+    private static process p(( int i = 0; i < N; i++)) {
+        for (int cycle = 1; cycle <= C ; cycle++) {
+            
+            P(mutex[i]);
+
+            x++;
+            System.out.println("Proceso " + i + " x= " +x);
+            V(mutex[(i+1)%N]);
+        }
+    }
+
+
+    private static op void done() {
+
+        System.out.println(x);
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

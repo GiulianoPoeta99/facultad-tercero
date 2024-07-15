@@ -1,0 +1,68 @@
+import edu.ucdavis.jr.JR;
+import Monitor.monitor; 
+
+public class main {
+
+    private static Monitor monitor = new Monitor();
+
+    private static process productor((int i = 1 ; i<= N; i++)) {
+        while(true){
+            monitor.producir();
+        }
+    }
+
+    private static process consumidor( (int i = 1 ; i <= M; i++)) {
+        while(true){
+            monitor.consumir();
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done");
+    }
+}
+
+public class Monitor{ 
+
+    private static final int MAX_PRODUCTOS = 50;
+    private static int producto = 0;
+    private static int productoConsumido = 0;
+    private static sem buffer = 1; 
+
+    public static process producir {
+        P(buffer);
+        while (producto < MAX_PRODUCTOS){
+            //Se crean los productos
+            producto ++;
+            System.out.println("Producto creado: " + producto);
+        }
+        V(buffer);
+    }
+
+    public static process consumir {
+        P(buffer);
+        while (productoConsumido < MAX_PRODUCTOS){
+            if(producto > 0){
+                //Se consumen los productos
+                productoConsumido ++;
+                System.out.println("Producto consumido: " + productoConsumido);
+            }
+        }
+        V(buffer);
+    }
+
+    public static void main(String[] args) {
+        cobegin {
+            producir();
+            consumir();
+        }
+    }
+}

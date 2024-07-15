@@ -1,0 +1,100 @@
+import edu.ucdavis.jr.JR;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Random;
+
+public class Pizzeria{
+
+    private static final int pizzas_ordenadas = 30;
+
+    private static sem falta_queso = 0;
+    private static sem falta_salsa = 0;
+    private static sem falta_morron = 0;
+    private static sem pizza_completa = 0;
+
+    private static int cantidad_pizzas = 0;
+
+    private static Set<String> pizza = new HashSet<String>();
+    private static Set<String> ingredientes = new HashSet<String>();
+
+    private static process chef{
+        
+        ingredientes.add("salsa");
+        ingredientes.add("queso");
+        ingredientes.add("morron");
+
+        String[] array = ingredientes.toArray(new String[0]);
+
+        for (int i = 0; i < pizzas_ordenadas; i++) {
+            //crea la pizza y le agrega 2 ingredientes
+
+            Random rand = new Random();
+            int randomIndex = rand.nextInt(array.length);
+            pizza.add(array[randomIndex]);
+            pizza.add(array[(randomIndex + 1) % array.length]);
+
+            if (!pizza.contains("queso")) {
+                System.out.println("El chef agrega salsa y morron, falta queso");
+                V(falta_queso);
+            } else if (!pizza.contains("salsa")) {
+                System.out.println("El chef agrega queso y morron, falta salsa");
+                V(falta_salsa);
+            } else {
+                System.out.println("El chef agrega salsa y queso, falta morron");
+                V(falta_morron);
+            }
+
+            P(pizza_completa);
+            pizza.clear();
+            cantidad_pizzas++;
+        }
+
+        System.out.println("Pizzas hechas "+ cantidad_pizzas);
+
+    }
+
+    private static process ayudanteMorron{
+        while (true) {
+            P(falta_morron);
+            pizza.add("morron");
+            System.out.println("El ayudante agrega morron");
+            V(pizza_completa);
+        }
+    }
+
+    private static process ayudanteSalsa{
+        while (true) {
+            P(falta_salsa);
+            pizza.add("salsa");
+            System.out.println("El ayudante agrega salsa");
+            V(pizza_completa);
+        }
+    }
+
+    private static process ayudanteQueso{
+        while (true) {
+            P(falta_queso);
+            pizza.add("queso");
+            System.out.println("El ayudante agrega queso");
+            V(pizza_completa);
+        }
+    }
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+        
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

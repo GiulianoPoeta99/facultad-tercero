@@ -1,0 +1,71 @@
+import edu.ucdavis.jr.JR;
+
+
+//downside -> n variables para n procesos
+//downside -> necesita una politica de decision fuertemente justa (la cual no es practica), esto porque existe la posibilidad de que el mismo proceso sea asignado al cpu una y otra vez , haciendo que el otro/otros esperen indefinidamente
+//
+
+public class PrimerIntento {
+    private static int x = 0;
+    private static int y = 0;
+    
+    private static boolean p1 = false;
+    private static boolean p2 = false;
+
+    private static int S = 6;
+    
+    private static process process1{
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                if (!p2) {
+                    //entry protocol
+                    p1 = true;
+    
+                    //critical section
+                    x = x +1;
+                    y = y + x;
+    
+                    //exit protocol
+                    p1 = false;
+                    break;
+                }
+            }
+        }
+        
+        
+    }
+    
+
+    private static process process2{
+
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                if (!p1) {
+                    //entry protocol
+                    p2 = true;
+    
+                    //critical section
+                    x = x + 2;
+                    y = y - x;
+                    
+                    //exit protocol
+                    p2 = false;
+                    break;
+                }
+            }
+        }
+        
+        
+    }
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+}

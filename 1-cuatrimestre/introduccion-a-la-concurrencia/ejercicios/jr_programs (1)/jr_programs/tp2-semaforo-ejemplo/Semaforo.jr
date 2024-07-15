@@ -1,0 +1,39 @@
+import edu.ucdavis.jr.JR;
+
+public class Semaforo {
+    
+    private static int x = 0;
+    private static int y = 0;
+
+    private static sem mutex = 1;
+    private static final int N = 20;
+
+    private static process p( (int i = 0; i < N ; i++)) {
+        while (true) {
+            //entry protocol
+            P(mutex);
+
+            //critical section
+            x = x +1;
+            y = y + x;
+
+            //exit protocol
+            V(mutex);
+            break;
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+
+
+}

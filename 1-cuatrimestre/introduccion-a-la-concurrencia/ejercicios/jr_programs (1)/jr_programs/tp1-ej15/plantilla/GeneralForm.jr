@@ -1,0 +1,33 @@
+import edu.ucdavis.jr.JR;
+
+
+//esta es la plantilla basicamente
+
+public class GeneralForm {
+    private static final int S = 4; // number of "sessions"
+    private static final int N = 6; // number of processes
+    private static int x = 0;
+    private static process p(int i) {
+        for (int s = 1; s <= S; s++) {
+            // non-critical section
+            // ...
+            entryProtocol();
+            // critical section
+            x += 3;
+            // exit protocol
+            = 0;
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done: x = " + x);
+    }
+}

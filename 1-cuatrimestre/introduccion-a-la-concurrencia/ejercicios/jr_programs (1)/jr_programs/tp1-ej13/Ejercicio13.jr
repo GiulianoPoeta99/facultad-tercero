@@ -1,0 +1,44 @@
+import edu.ucdavis.jr.JR;
+
+
+public class Ejercicio13 {
+    private static int a = 1;
+    private static int b = 12;
+    private static int c = 5;
+    private static int d = 3;
+    private static int e = 2;
+    private static int f = 1;
+
+    private static int x;
+    private static int y; 
+    private static int z; 
+
+
+    private static process p1{
+        x = 3*a*b + 4;
+    }
+
+    private static process p2{
+        y = c - d;
+    }
+
+    private static process p3{
+        z = e - f;
+    }
+        
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+
+        System.out.println(x / (int)Math.pow(y,z));
+
+
+    }
+
+}

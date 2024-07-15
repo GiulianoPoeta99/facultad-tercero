@@ -1,0 +1,66 @@
+//EL programa funciona pero cuando la cantidad de productos producidos es muy grande, se rompe (consultar profe)
+import edu.ucdavis.jr.JR;
+
+import java.util.Random;
+
+public class ProductConsum {
+
+
+    private static int cantidadProductos = 40; //el productor va a generar 30 numeros
+
+    private static Queue cola = new Queue(30);
+
+    private static boolean terminar = false; //variable para comunicar al consumidor que el programa termino
+
+    private static int suma = 0; //variable sobre la cual va a trabajar el consumidor
+
+    private static process productor{
+
+        for (int i = 1 ; i<= cantidadProductos; i++) {
+            Random random = new Random();
+    
+            int randomInt = random.nextInt(50);
+
+            System.out.println("Numero producido: " + randomInt);
+            
+            if (cola.llena()) {
+                System.out.println(cola);
+                while (cola.llena()) {};
+            }
+            
+    
+            cola.push(randomInt);
+        }
+        terminar = true;
+        
+
+    }
+
+    private static process consumir{
+        while (!terminar && cola.vacia()) {};
+        while (!terminar || !cola.vacia() ||(terminar && !cola.vacia()) || (cola.vacia() && !terminar) ) {
+            while (!terminar && cola.vacia()) {};
+            while (!cola.vacia()) {
+                suma = suma + cola.pop();
+                System.out.println("Suma parcial = " + suma);
+
+            }
+
+        }
+    
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+            System.out.println("se rompio jaja");
+        }
+    }
+    
+    private static op void done() {
+
+        System.out.println("Suma total: " + suma);
+    }
+}

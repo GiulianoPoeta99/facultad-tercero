@@ -1,0 +1,88 @@
+//Simple para cualquier cantidad de procesos pero requiere una instruccion especial de maquina llamada fetch and add
+// Es muy facil de entender e implementar para n procesos
+//perfecto para scheduling debilmente justo
+//si el algoritmo corre durante un periodo de tiempo muy largo, el incremento del contador puede ocasionar un arithmetic overflow, preo es muy poco probable que suceda
+import edu.ucdavis.jr.JR;
+
+public class Ticket{
+
+    private static int number = 1;
+    private static int next = 1;
+    private static int[] turn= {0,0,0};
+    private static int S = 6;
+    private static int x = 0;
+    private static int y = 0;
+
+    private static process p0{
+        
+        for (int s = 0 ; s <= S ;s++) {
+            do{
+                turn[0] = number; //en este lugar iria la instruccion fetch and add
+                number =+ 1; //estas dos lineas se deberian ejecutar atomicamente para poder garantizar correcto funcionamiento
+    
+                while (turn[0] != next){};
+                //critical section
+                x = x +1;
+                y = y + x;
+    
+                //exit protocol
+                next =+ 1;
+    
+                break;
+    
+            } while(true);
+        }
+        
+    }
+
+    private static process p1 {
+        for (int s = 0 ; s <= S ;s++) {
+            do{
+                turn[1] = number;
+                number =+ 1;
+    
+                while (turn[1] != next){};
+                //critical section
+                x = x +1;
+                y = y + x;
+    
+                //exit protocol
+                next =+ 1;
+                break;
+    
+            } while(true);
+        }
+    }
+
+    private static process p2 {
+        for (int s = 0 ; s <= S ;s++) {
+            do{
+                turn[2] = number; 
+                number =+ 1;
+    
+                while (turn[2] != next){};
+                //critical section
+                x = x +1;
+                y = y + x;
+    
+                //exit protocol
+                next =+ 1;
+                break;
+    
+            } while(true);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+}

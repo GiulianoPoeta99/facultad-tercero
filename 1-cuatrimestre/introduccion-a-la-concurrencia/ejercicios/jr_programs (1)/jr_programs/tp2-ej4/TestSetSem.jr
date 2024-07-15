@@ -1,0 +1,48 @@
+import edu.ucdavis.jr.JR;
+
+
+public class TestSetSem {
+    private static int x = 0;
+    private static int y = 0;
+
+    private static sem mutex = 1;
+    private static final int N = 20;
+
+    private static boolean lock = false;
+
+
+    private static boolean testSetSem(boolean lock) {
+        P(mutex);
+        boolean initial = lock;
+        lock = true;
+        V(mutex);
+        return initial;
+    }
+
+    private static process p1( (int i = 0; i < N ; i++) ) {
+        while (true) {
+            //entry protocol
+            while (testSetSem(lock)) {};   
+            //critical section
+            x = x +1;
+            y = y + x;
+
+            //exit protocol
+            lock = false;
+            break;
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+
+}

@@ -1,0 +1,107 @@
+/*Consultar profe, la solucion justa coincide con la prioridad de escritor*/
+
+
+import edu.ucdavis.jr.JR;
+import java.util.Random;
+
+public class PrioridadEscritor{
+
+    private static sem blockRead = 1;
+    private static sem blockWrite = 0;
+
+    private static sem mutexReaders = 1;
+    private static sem mutexWriters = 1;
+
+    private static final int N = 8;
+    private static final int M = 2 ;
+    private static int lectoresActivos = 0;
+    private static int escritoresActivos = 0;
+
+    private static process lector((int i = 0 ; i < M ; i++)) {
+
+        while (true) {
+            
+            P(mutexReaders);
+            lectoresActivos++;
+            if (lectoresActivos == 1) {
+                P(blockRead); //bloqueo/espero a los escritores
+            }
+            V(mutexReaders);
+
+            System.out.println("El lector " + i + " pudo leer el documento" );
+
+
+            P(mutexReaders);
+            lectoresActivos--;
+            if (lectoresActivos == 0) {
+                V(blockRead);
+            }
+            V(mutexReaders);
+            
+            Random random = new Random();
+            int tiempoAleatorio = random.nextInt(1001);
+            dormir(tiempoAleatorio);
+            
+        }
+
+    }
+
+    private static process escritor ((int i = 0 ; i < N ; i++)) {
+
+        while (true) {
+
+            P(mutexWriters);
+            escritoresActivos++;
+            if (escritoresActivos == 1) {
+                P(blockRead); //bloqueo/espero a los lectores
+                V(blockWrite); //como el sem esta inicializado en 0 actua como barrier
+            } 
+            V(mutexWriters);
+            
+            P(blockWrite);
+            System.out.println("El escritor " + i + " escribio"); 
+            V(blockWrite);
+            
+            P(mutexWriters);
+            escritoresActivos--;
+            if (escritoresActivos == 0) {
+                V(blockRead); //libero el documento para que se pueda leer o escribir nuevamente si hay mala suerte
+                System.out.println("El escritor " + i + " libera el archivo para poder ser leido o escrito nuevamente");
+            }
+            V(mutexWriters);
+
+            Random random = new Random();
+            int tiempoAleatorio = random.nextInt(1001);
+            dormir(tiempoAleatorio);
+        }
+        
+    }
+
+
+    public static void dormir(long tiempoEnMilisegundos) {
+        try {
+            // Duerme al proceso durante el tiempo especificado
+            Thread.sleep(tiempoEnMilisegundos);
+        } catch (InterruptedException e) {
+            System.out.println("El proceso fue interrumpido mientras dormia.");
+        }
+    }
+    
+
+    private static op void done() {
+
+        System.out.println("");
+
+    }
+
+    public static void main(String[] args){
+
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

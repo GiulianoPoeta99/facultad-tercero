@@ -1,0 +1,80 @@
+//solucion mas simple que tie breaker, de grano fino y no requiere instrucciones de maquina especiales
+//en vez de fetch and add, los procesos chequean con los otros en vez de usar un contador next para decidir el orden del servicio
+import edu.ucdavis.jr.JR;
+
+public class Bakery{
+
+    private static int S = 6;
+    private static int x = 0;
+    private static int y = 0;
+    private static int[] turn= {0,0};
+    private static int turnLenght = 2;
+
+    private static int maximo(int[] arr) {
+
+        int max = arr[0];
+
+        for (int i = 1; i < turnLenght; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+
+    private static process p0{
+        for (int s = 0 ; s <= S ;s++) {
+            do {
+                turn[0] = 1;
+                turn[0] = maximo(turn) + 1;
+
+                for (int j =1; j <= turnLenght -1 ; j++) {
+                    while ((turn[j] != 0) && (turn[0] < turn[j])){};
+                }
+                //critical section
+                x = x +1;
+                y = y + x;
+
+                //exit protocol
+                turn[0] = 0;
+
+                break;
+            } while(true);
+        }
+    }
+
+    private static process p1{
+        for (int s = 0 ; s <= S ;s++) {
+            do {
+                turn[1] = 1;
+                turn[1] = maximo(turn) + 1;
+
+                for (int j = 1; j <= turnLenght -1 ; j++) {
+                    while (turn[j] != 0 && turn[1] < turn[j]){};
+                }
+                //critical section
+                x = x +1;
+                y = y + x;
+
+                //exit protocol
+                turn[1] = 0;
+
+                break;
+            } while(true);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+            System.out.println("se rompio jaja");
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+}

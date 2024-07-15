@@ -1,0 +1,57 @@
+import edu.ucdavis.jr.JR;
+
+public class FetchArr {
+    
+    private static int[] arr = {500,2,5600,1000,9,200,12,15,1,9,201,60000};
+    
+    private static int maxImpar;
+    private static int maxPar;
+    
+    private static int arrLenght = 12; //NO PUEDO USAR ARR.LENGHT PORQUE ESTE LENGUAJE ES UNA MIERDA
+
+
+    private static process impar{
+        
+        maxImpar = arr[1];
+
+        for (int i = 1; i <= arrLenght -1; i +=2 ) {
+            if (arr[i] > maxImpar) {
+                maxImpar = arr[i];
+            }
+        }
+    }
+
+    private static process par{
+        maxPar = arr[0];
+
+        for (int i=0; i <= arrLenght -1; i+=2) {
+            if (arr[i] > maxPar) {
+                maxPar = arr[i];
+            }
+        }
+
+    }
+
+    
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+            System.out.println("se rompio jaja");
+        }
+    }
+    
+    private static op void done() {
+        System.out.println("maxImpar = " + maxImpar + " maxPar = " + maxPar);
+        
+        if (maxImpar > maxPar) {
+            System.out.println("El mayor es: " + maxImpar);
+        } else if(maxPar > maxImpar) {
+            System.out.println("El mayor es: " + maxPar);
+        } else {
+            System.out.println("El mayor es: " + maxImpar);
+        }
+        
+    }
+}

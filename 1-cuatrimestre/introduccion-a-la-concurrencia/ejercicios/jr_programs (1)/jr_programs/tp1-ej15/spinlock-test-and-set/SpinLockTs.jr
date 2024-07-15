@@ -1,0 +1,67 @@
+import edu.ucdavis.jr.JR;
+
+//cumple con las 4 propiedades
+//downside -> mal rendimiento debido al uso de memoria compartido de la variable lock a la cual referencian todos los procesos retrasados continuamente. A esto se lo llama "hotspot" y genera contencion de memoria, lo cual degrada el rendimieento de las unidades de memoeria e interconecciones de redes de procesador-memoria
+
+public class SpinLockTs {
+
+    private static int x = 0;
+    private static int y = 0;
+    private static boolean lock = false;
+
+    private static int S = 4;
+
+
+    private static synchronized boolean testSet(boolean lock) {
+        boolean initial = lock;
+        lock = true;
+        return initial;
+    }
+
+    private static process process1{
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                //entry protocol
+                while (testSet(lock)) {}
+
+                //critical section
+                x = x +1;
+                y = y + x;
+    
+                //exit protocol
+                lock = false;
+                break;
+            }
+        }
+    }
+                    
+    private static process process2{
+
+        for (int s = 0 ; s <= S ;s++) {
+            while (true) {
+                //entry protocol
+                while (testSet(lock)) {}
+
+                //critical section
+                x = x + 2;
+                y = y - x;
+    
+                //exit protocol
+                lock = false;
+                break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static op void done() {
+        System.out.println("done: x = " + x +" y = " + y);
+    }
+}

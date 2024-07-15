@@ -1,0 +1,56 @@
+
+import java.util.LinkedList;
+
+public class Queue {
+    private LinkedList<Integer> elementos;
+    private int sizeMax;
+
+    public Queue(int sizeMax) {
+        this.elementos = new LinkedList<Integer>();
+        this.sizeMax = sizeMax;
+
+    }
+
+    // Metodo para agregar un elemento a la cola
+    public void push(int elemento) {
+        elementos.addLast(elemento);
+    }
+
+    // Metodo para eliminar y devolver el primer elemento de la cola
+    public int pop() {
+        return elementos.removeFirst();
+    }
+
+    // Metodo para obtener el primer elemento de la cola sin eliminarlo
+    public int peek() {
+        return elementos.getFirst();
+    }
+
+    // Metodo para comprobar si la cola esta vacia
+    public boolean vacia() {
+        return elementos.isEmpty();
+    }
+
+    public boolean llena() {
+        if (this.longitud() == this.sizeMax) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Metodo para obtener el tamano de la cola
+    public int longitud() {
+        return elementos.size();
+    }
+
+    @Override
+    public String toString() {
+        String a = "";
+        for (Integer i : this.elementos) {
+            a = a + " , "  + Integer.toString(i);
+        }
+
+        return a;
+    }
+}

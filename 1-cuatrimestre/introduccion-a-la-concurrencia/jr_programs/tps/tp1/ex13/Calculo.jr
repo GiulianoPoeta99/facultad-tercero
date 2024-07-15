@@ -1,0 +1,36 @@
+import edu.ucdavis.jr.JR;
+
+public class Calculo {
+    private static float a = 2;
+    private static float b = 3;
+    private static float c = 4;
+    private static float d = 1;
+    private static float e = 2;
+    private static float f = 1;
+    private static float x;
+    private static float y;
+    private static float total;
+
+
+
+    private static process calcularNumerador {
+        x = (3*a*b)+4;
+    }
+
+    private static process calcularDenominador {
+        y = (int) Math.pow((c-d), (e-f));
+    }
+    
+    public static void main(String[] args) {
+        try {
+            JR.registerQuiescenceAction(done);
+        } catch (edu.ucdavis.jr.QuiescenceRegistrationException e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    private static op void done() {
+        total = x / y;
+        System.out.println("Total:" + total);
+    }
+}
